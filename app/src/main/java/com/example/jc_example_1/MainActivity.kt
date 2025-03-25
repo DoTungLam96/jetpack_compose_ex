@@ -42,11 +42,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val context = LocalContext.current
             Jc_example_1Theme {
                 val navController = rememberNavController()
                 AppNavHost(navController)
             }
+
         }
     }
 }

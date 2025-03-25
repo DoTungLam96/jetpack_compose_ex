@@ -1,8 +1,6 @@
 package com.example.jc_example_1.views
 
 import CustomCenterTopAppBar
-import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -27,14 +25,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.jc_example_1.User
+import com.example.jc_example_1.models.Routes
+import com.example.jc_example_1.models.User
+import com.example.jc_example_1.viewmodels.ShareViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, user: User? = null, viewModel: ShareViewModel = hiltViewModel()) {
     val context = LocalContext.current
     Scaffold(topBar = {
-        CustomCenterTopAppBar(title = "Home", actions = {
+        CustomCenterTopAppBar(title = "Home",
+            onBackClick = {
+                navController.popBackStack()
+            },
+
+            actions = {
             Row {
                 IconButton(onClick = {
                     Toast.makeText(
@@ -82,10 +88,12 @@ fun HomeScreen(navController: NavHostController) {
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.height(52.dp),
                     onClick = {
-                        val user = User(id = 1, name = "Lam Do");
-                        navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
 
-                        navController.navigate("detailScreen")
+                       // navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
+
+                      val user =  viewModel.user;
+
+                        navController.navigate(Routes.DETAIL_SCREEN)
                     },
 
                     ) {
