@@ -14,7 +14,8 @@ class ShareViewModel @Inject constructor() : ViewModel() {
     var user by mutableStateOf<User?>(null)
     private set
 
-    fun setUser(newUser: User?) {
+
+    fun updateUser(newUser: User?) {
         newUser?.let {
             user = it
         }

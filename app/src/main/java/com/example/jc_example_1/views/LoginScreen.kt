@@ -36,7 +36,7 @@ fun LoginScreen(navController: NavHostController, viewModel: ShareViewModel = hi
 
 //                navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
 
-                viewModel.setUser(user)
+                viewModel.updateUser(user)
 
                 navController.navigate(Routes.HOME_SCREEN)
             },

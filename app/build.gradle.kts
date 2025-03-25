@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -53,7 +55,9 @@ android {
 dependencies {
     val nav_version = "2.8.9"
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+//    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.51.1")
     implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,4 +74,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
