@@ -1,22 +1,21 @@
 package com.example.jc_example_1.viewmodels
 
-import android.accounts.Account
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.jc_example_1.models.AccountModel
 import com.example.jc_example_1.models.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ShareViewModel @Inject constructor() : ViewModel() {
-    var user by mutableStateOf<User?>(null)
-    private set
-
-    fun updateUser(newUser: User?) {
-        newUser?.let {
-            user = it
+class HomeViewModel @Inject constructor() : ViewModel() {
+    var account by mutableStateOf<AccountModel?>(null)
+        private set
+    fun updateAccountModel(acc: AccountModel?){
+        acc.let {
+            account = it
         }
     }
 }

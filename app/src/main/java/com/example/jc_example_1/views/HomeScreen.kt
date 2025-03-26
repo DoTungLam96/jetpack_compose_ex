@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,57 +30,87 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.jc_example_1.models.AccountModel
 import com.example.jc_example_1.models.Routes
 import com.example.jc_example_1.models.User
+import com.example.jc_example_1.viewmodels.HomeViewModel
+import com.example.jc_example_1.viewmodels.LoginViewModel
 import com.example.jc_example_1.viewmodels.ShareViewModel
 
 @SuppressLint("UnrememberedGetBackStackEntry", "SuspiciousIndentation")
 @Composable
-fun HomeScreen(navController: NavHostController, user: User? = null,) {
+fun HomeScreen(
+    navController: NavHostController,
+    user: User? = null,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val parentEntry = remember(navController) {
-        navController.getBackStackEntry(Routes.LOGIN_SCREEN)
+//    val parentEntry = navController.getBackStackEntry(Routes.LOGIN_SCREEN)
+//
+//
+//    val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
+
+    // Lấy dữ liệu user được truyền từ LoginScreen qua SavedStateHandle
+    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
+    val user = savedStateHandle?.get<User>("user")
+    val loginViewModel: LoginViewModel = hiltViewModel()
+
+    // Khi có user, load thông tin Account
+    LaunchedEffect(user) {
+        user?.let {
+            viewModel.updateAccountModel(
+                AccountModel(
+                    id = it.id.toString(),
+                    name = it.name
+                )
+            )
+        }
     }
 
-    val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
 
-    val account = sharedViewModel.user
+
     Scaffold(topBar = {
         CustomCenterTopAppBar(title = "Home",
             onBackClick = {
+
+//                loginViewModel.login(
+//                    username = (viewModel.account?.id ?: "0").toInt(),
+//                    password = viewModel.account?.name ?: ""
+//                )
+
                 navController.popBackStack()
             },
 
             actions = {
-            Row {
-                IconButton(onClick = {
-                    Toast.makeText(
-                        context, "Bạn vừa bấm ${sharedViewModel.user?.name}", Toast.LENGTH_SHORT
-                    ).show()
-                }) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = "Menu",
-                        tint = Color.White
-                    )
-                }
-
-                IconButton(onClick = {
-                    Toast.makeText(
-                        context, "Bạn vừa bấm ${sharedViewModel.user?.id}", Toast.LENGTH_SHORT
-                    ).show()
-                }) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Add",
-                        tint = Color.White,
-
+                Row {
+                    IconButton(onClick = {
+                        Toast.makeText(
+                            context, "Bạn vừa bấm ${viewModel.account?.name}", Toast.LENGTH_SHORT
+                        ).show()
+                    }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "Menu",
+                            tint = Color.White
                         )
+                    }
+
+                    IconButton(onClick = {
+                        Toast.makeText(
+                            context, "Bạn vừa bấm ${viewModel.account?.id}", Toast.LENGTH_SHORT
+                        ).show()
+                    }) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add",
+                            tint = Color.White,
+
+                            )
+
+                    }
 
                 }
-
-            }
-        })
+            })
     }) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -99,9 +130,9 @@ fun HomeScreen(navController: NavHostController, user: User? = null,) {
                     modifier = Modifier.height(52.dp),
                     onClick = {
 
-                       // navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
+                        // navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
 
-                       sharedViewModel.updateUser(User(id = 2, name = "Lam Sao"))
+//                       sharedViewModel.updateUser(User(id = 2, name = "Lam Sao"))
 
                         navController.navigate(Routes.DETAIL_SCREEN)
                     },

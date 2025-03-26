@@ -1,6 +1,5 @@
 package com.example.jc_example_1.viewmodels
 
-import android.accounts.Account
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,13 +9,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ShareViewModel @Inject constructor() : ViewModel() {
-    var user by mutableStateOf<User?>(null)
-    private set
+class LoginViewModel @Inject constructor() : ViewModel() {
+  var user by mutableStateOf<User?>(null)
+      private set
+    fun login(username: Int, password: String) {
 
-    fun updateUser(newUser: User?) {
-        newUser?.let {
-            user = it
-        }
+        user = User(id = username, name = password)
     }
 }

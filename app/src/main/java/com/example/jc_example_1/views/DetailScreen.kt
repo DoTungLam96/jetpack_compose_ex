@@ -28,9 +28,8 @@ import com.example.jc_example_1.viewmodels.ShareViewModel
 @Composable
 fun DetailScreen(navController: NavHostController, user: User? = null) {
     val context = LocalContext.current
-    val parentEntry = remember(navController) {
-        navController.getBackStackEntry(Routes.LOGIN_SCREEN)
-    }
+    val parentEntry = navController.getBackStackEntry(Routes.LOGIN_SCREEN)
+
 
     val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
     Scaffold(topBar = {
