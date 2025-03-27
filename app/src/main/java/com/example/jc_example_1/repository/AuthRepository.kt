@@ -41,7 +41,7 @@ class AuthRepositoryImpl @Inject constructor(    private val authService: AuthSe
 
             // Xử lý lỗi mạng, timeout, JSON lỗi, v.v.
             Log.e("API_ERROR", "Lỗi gọi API: ${e.message}")
-            ApiResult.Error(0,"")
+            ApiResult.Error(-1,"")
         }
     }
 }
