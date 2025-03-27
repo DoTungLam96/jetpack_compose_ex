@@ -36,7 +36,9 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
             // Lưu dữ liệu user qua SavedStateHandle của backStackEntry
             navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
             // Chuyển sang màn Home và loại bỏ màn Login khỏi back stack nếu cần
-            navController.navigate(Routes.HOME_SCREEN)
+            navController.navigate(Routes.HOME_SCREEN){
+                popUpTo(Routes.LOGIN_SCREEN) { inclusive = false }
+            }
         }
     }
 
@@ -47,13 +49,11 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
     ) {
         Button(
             onClick = {
-                val user = User(id = 1, name = "Lam Do");
+//                val user = User(id = 1, name = "Lam Do");
 
 //                navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
 
-                viewModel.login(username = user.id, password = user.name )
-
-
+//                viewModel.login(username = user.id, password = user.name )
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF009688)
