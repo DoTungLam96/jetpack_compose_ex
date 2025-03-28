@@ -2,9 +2,11 @@ package com.example.jc_example_1.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jc_example_1.models.LoginRequest
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,26 +22,49 @@ class LoginViewModel @Inject constructor(
         private set
     var user by mutableStateOf<User?>(null)
         private set
+    var errorMessage by mutableStateOf<String?>(null)
+        private  set
+    var username by mutableStateOf<String>("")
+    private set
+    var password by mutableStateOf<String>("")
+        private set
 
-    fun login(username: Int, password: String) {
+    fun onSetUsername(text: String){
+        username = text;
+    }
+
+    fun onSetPassword(text: String){
+        password = text;
     }
 
     fun resetState() {
         loginState = LoginUiState.Init
+        errorMessage = null
+
     }
-    fun onLoginClicked() {
+    fun onLoginClicked(username: String?, password: String?) {
+
+        errorMessage = null
+
+        if(username.isNullOrEmpty() || password.isNullOrEmpty()){
+            errorMessage = "Username or Password is not empty."
+
+            return
+        }
         viewModelScope.launch {
             loginState = LoginUiState.Loading
 
             try {
-                val result = authRepo.getComments(postId = 1)
+                val result = authRepo.login(LoginRequest(identityNo= username, password = password))
                 if (result is ApiResult.Success) {
-                    loginState = LoginUiState.getComments(result.data)
+                    loginState = LoginUiState.Success(result.data)
                 } else if (result is ApiResult.Error) {
-                    loginState = LoginUiState.Error( if (result.message.isNullOrEmpty()) "Network not connected" else result.message)
+                    errorMessage = if (result.message.isNullOrEmpty()) "Network not connected" else result.message
+                    loginState = LoginUiState.Error( errorMessage!!)
                 }
             } catch (e: Exception) {
-                loginState = LoginUiState.Error(e.message ?: "")
+                errorMessage = e.message ?: ""
+                loginState = LoginUiState.Error(errorMessage!!)
             }
         }
     }

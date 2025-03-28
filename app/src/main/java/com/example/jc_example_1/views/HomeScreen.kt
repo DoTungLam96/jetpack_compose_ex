@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.jc_example_1.models.AccountModel
+
 import com.example.jc_example_1.models.Routes
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.viewmodels.HomeViewModel
@@ -41,8 +41,7 @@ import com.example.jc_example_1.viewmodels.ShareViewModel
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    user: User? = null,
-    viewModel: HomeViewModel = hiltViewModel()
+
 ) {
     val context = LocalContext.current
 //    val parentEntry = navController.getBackStackEntry(Routes.LOGIN_SCREEN)
@@ -51,21 +50,16 @@ fun HomeScreen(
 //    val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
 
     // Lấy dữ liệu user được truyền từ LoginScreen qua SavedStateHandle
-    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
-    val user = savedStateHandle?.get<User>("user")
-    val loginViewModel: LoginViewModel = hiltViewModel()
+//    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
+//    val user = savedStateHandle?.get<User>("user")
+//    val loginViewModel: LoginViewModel = hiltViewModel()
 
     // Khi có user, load thông tin Account
-    LaunchedEffect(user) {
-        user?.let {
-            viewModel.updateAccountModel(
-                AccountModel(
-                    id = it.id.toString(),
-                    name = it.name
-                )
-            )
-        }
-    }
+//    LaunchedEffect(user) {
+//        user?.let {
+//
+//        }
+//    }
 
 
 
@@ -84,9 +78,7 @@ fun HomeScreen(
             actions = {
                 Row {
                     IconButton(onClick = {
-                        Toast.makeText(
-                            context, "Bạn vừa bấm ${viewModel.account?.name}", Toast.LENGTH_SHORT
-                        ).show()
+
                     }) {
                         Icon(
                             Icons.Default.MoreVert,
@@ -96,9 +88,7 @@ fun HomeScreen(
                     }
 
                     IconButton(onClick = {
-                        Toast.makeText(
-                            context, "Bạn vừa bấm ${viewModel.account?.id}", Toast.LENGTH_SHORT
-                        ).show()
+
                     }) {
                         Icon(
                             Icons.Default.Add,

@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,88 +38,74 @@ import com.example.jc_example_1.viewmodels.ShareViewModel
 @Composable
 fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
 
-    // Quan sát trạng thái user từ ViewModel
-    val user = viewModel.user
-
     val loginState = viewModel.loginState
 
-    var isLoading by remember { mutableStateOf<Boolean>(true) }
-
     val context = LocalContext.current
-
-    var messageError by remember { mutableStateOf<String?>(null) }
 
     // Cập nhật messageError dựa vào loginState
     LaunchedEffect(loginState) {
         when (loginState) {
-            is LoginUiState.Loading -> isLoading = true
+            is LoginUiState.Init, is LoginUiState.Loading -> Unit
             is LoginUiState.Error -> {
-                messageError = loginState.message
-                isLoading = false
-//                viewModel.resetState()
+                Toast.makeText(context, loginState.message, Toast.LENGTH_LONG).show()
             }
-            is LoginUiState.getComments -> {
-                isLoading = false
-                navController.currentBackStackEntry
-                    ?.savedStateHandle?.set("lstComment", loginState.lstComment)
+
+            is LoginUiState.Success -> {
+                navController.currentBackStackEntry?.savedStateHandle?.set(
+                        Routes.ACCESS_TOKEN,
+                        loginState.data
+                    )
                 navController.navigate(Routes.HOME_SCREEN) {
                     // Nếu không muốn quay lại LoginScreen, loại bỏ nó khỏi back stack
                     popUpTo(Routes.LOGIN_SCREEN) { inclusive = true }
                 }
-                messageError = null
-            }
-            else -> {
-                isLoading = false
-                messageError = null
-                viewModel.resetState()
-            }
-        }
-    }
 
-
-    // Khi user không null (đăng nhập thành công) thì chuyển sang HomeScreen
-    if (user != null) {
-        LaunchedEffect(user) {
-            // Lưu dữ liệu user qua SavedStateHandle của backStackEntry
-            navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
-            // Chuyển sang màn Home và loại bỏ màn Login khỏi back stack nếu cần
-            navController.navigate(Routes.HOME_SCREEN){
-                popUpTo(Routes.LOGIN_SCREEN) { inclusive = false }
             }
         }
     }
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+                            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-      if (isLoading) {
-          Spacer(modifier = Modifier.height(16.dp))
-          CircularProgressIndicator()
-      } else  Button(
-            onClick = {
-                viewModel.onLoginClicked()
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF009688)
-            ), // Màu cam
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.height(52.dp),
-        ) {
-            Text(text = "Go to HomeScreen")
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        messageError?.let {
-            Text(
-                text = it,
-                color = Color.Red,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-
-
+          _buildBody(loginState)
     }
+}
 
+@Composable
+private fun _buildBody(loginState: LoginUiState) {
+    val viewModel: LoginViewModel = hiltViewModel()
+    OutlinedTextField(value = viewModel.username, onValueChange = {
+        viewModel.onSetUsername(it)
+    }, label = { Text("Username") }, modifier = Modifier.fillMaxWidth()
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    OutlinedTextField(value = viewModel.password, onValueChange = {
+        viewModel.onSetPassword(it)
+    }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth()
+    )
+    Spacer(modifier = Modifier.height(20.dp))
+    if (loginState is LoginUiState.Loading) {
+        Spacer(modifier = Modifier.height(16.dp))
+        CircularProgressIndicator()
+    } else  Button(
+        onClick = {
+            viewModel.onLoginClicked(username = viewModel.username, password = viewModel.password)
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF009688)
+        ), // Màu cam
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.height(52.dp),
+    ) {
+        Text(text = "Go to HomeScreen")
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+
+    viewModel.errorMessage?.let {
+        Text(
+            text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp)
+        )
+    }
 }

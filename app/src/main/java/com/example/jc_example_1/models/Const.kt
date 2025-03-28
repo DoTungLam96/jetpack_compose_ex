@@ -6,4 +6,8 @@ object Routes {
     const val LOGIN_SCREEN = "loginScreen"
     const val OTHER_SCREEN = "otherScreen"
     const val BASE_URL = "https://jsonplaceholder.typicode.com"
+    const val BASE_URL_PTI = "https://gateway.pti.com.vn"
+    const val AUTH_SERVICE = "authService"
+    const val USER_SERVICE = "userService"
+    const val ACCESS_TOKEN = "accessToken"
 }
