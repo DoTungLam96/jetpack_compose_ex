@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.jc_example_1.models.Routes
+import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.viewmodels.ShareViewModel
 
@@ -28,7 +28,7 @@ import com.example.jc_example_1.viewmodels.ShareViewModel
 @Composable
 fun DetailScreen(navController: NavHostController, user: User? = null) {
     val context = LocalContext.current
-    val parentEntry = navController.getBackStackEntry(Routes.LOGIN_SCREEN)
+    val parentEntry = navController.getBackStackEntry(Const.LOGIN_SCREEN)
 
 
     val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
@@ -48,12 +48,12 @@ fun DetailScreen(navController: NavHostController, user: User? = null) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Welcome ${sharedViewModel.user?.name}")
+                Text(text = "Welcome ${sharedViewModel.user?.userId}")
                 Button(
                     modifier = Modifier.padding(top = 16.dp),
                     onClick = {
 
-                    navController.navigate(Routes.OTHER_SCREEN)
+                    navController.navigate(Const.OTHER_SCREEN)
 
                 }) {
                     Text(text = "Go to Others")

@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.jc_example_1.models.Routes
+import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.viewmodels.ShareViewModel
 
@@ -25,9 +25,9 @@ fun OtherScreen(navController: NavHostController, user: User? = null) {
     val viewModel: ShareViewModel = hiltViewModel()
     Scaffold(topBar = {
         CustomCenterTopAppBar(title = "Other Screen", onBackClick = {
-//            navController.popBackStack(route = Routes.HOME_SCREEN, inclusive = true)
+//            navController.popBackStack(route = Const.HOME_SCREEN, inclusive = true)
 
-            navController.navigate(Routes.HOME_SCREEN) {
+            navController.navigate(Const.HOME_SCREEN) {
                 popUpTo("login") { inclusive = false }
                 launchSingleTop = true
             }
@@ -42,7 +42,7 @@ fun OtherScreen(navController: NavHostController, user: User? = null) {
                 modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 Text(text = "Other Screen!")
-                Text(text = "Hello ${viewModel.user?.name}", modifier = Modifier.padding(top = 10.dp))
+                Text(text = "Hello ${viewModel.user?.userId}", modifier = Modifier.padding(top = 10.dp))
             }
 
         }

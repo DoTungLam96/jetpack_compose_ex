@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
-import com.example.jc_example_1.models.Routes
+import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.viewmodels.HomeViewModel
 import com.example.jc_example_1.viewmodels.LoginViewModel
@@ -41,36 +41,16 @@ import com.example.jc_example_1.viewmodels.ShareViewModel
 @Composable
 fun HomeScreen(
     navController: NavHostController,
+    viewModel: HomeViewModel = hiltViewModel()
 
 ) {
     val context = LocalContext.current
-//    val parentEntry = navController.getBackStackEntry(Routes.LOGIN_SCREEN)
-//
-//
-//    val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
-
-    // Lấy dữ liệu user được truyền từ LoginScreen qua SavedStateHandle
-//    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
-//    val user = savedStateHandle?.get<User>("user")
-//    val loginViewModel: LoginViewModel = hiltViewModel()
-
-    // Khi có user, load thông tin Account
-//    LaunchedEffect(user) {
-//        user?.let {
-//
-//        }
-//    }
 
 
 
     Scaffold(topBar = {
         CustomCenterTopAppBar(title = "Home",
             onBackClick = {
-
-//                loginViewModel.login(
-//                    username = (viewModel.account?.id ?: "0").toInt(),
-//                    password = viewModel.account?.name ?: ""
-//                )
 
                 navController.popBackStack()
             },
@@ -120,11 +100,7 @@ fun HomeScreen(
                     modifier = Modifier.height(52.dp),
                     onClick = {
 
-                        // navController.currentBackStackEntry?.savedStateHandle?.set("user", user)
-
-//                       sharedViewModel.updateUser(User(id = 2, name = "Lam Sao"))
-
-                        navController.navigate(Routes.DETAIL_SCREEN)
+                        navController.navigate(Const.DETAIL_SCREEN)
                     },
 
                     ) {

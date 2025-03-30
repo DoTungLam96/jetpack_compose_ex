@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.jc_example_1.models.Routes
+import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.viewmodels.LoginUiState
 import com.example.jc_example_1.viewmodels.LoginViewModel
@@ -52,24 +53,24 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
 
             is LoginUiState.Success -> {
                 navController.currentBackStackEntry?.savedStateHandle?.set(
-                        Routes.ACCESS_TOKEN,
-                        loginState.data
-                    )
-                navController.navigate(Routes.HOME_SCREEN) {
+                    "Const.ACCESS_TOKEN", loginState.data
+                )
+                navController.navigate(Const.HOME_SCREEN) {
                     // Nếu không muốn quay lại LoginScreen, loại bỏ nó khỏi back stack
-                    popUpTo(Routes.LOGIN_SCREEN) { inclusive = true }
+                    popUpTo(Const.LOGIN_SCREEN) { inclusive = true }
                 }
 
             }
         }
     }
     Column(
-        modifier = Modifier.fillMaxSize()
-                            .padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-          _buildBody(loginState)
+        _buildBody(loginState)
     }
 }
 
@@ -81,15 +82,20 @@ private fun _buildBody(loginState: LoginUiState) {
     }, label = { Text("Username") }, modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(12.dp))
-    OutlinedTextField(value = viewModel.password, onValueChange = {
+    OutlinedTextField(
+        value = viewModel.password,
+        onValueChange = {
         viewModel.onSetPassword(it)
-    }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth()
+    },
+        label = { Text("Password") },
+      
+        modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(20.dp))
     if (loginState is LoginUiState.Loading) {
         Spacer(modifier = Modifier.height(16.dp))
         CircularProgressIndicator()
-    } else  Button(
+    } else Button(
         onClick = {
             viewModel.onLoginClicked(username = viewModel.username, password = viewModel.password)
         },
@@ -99,7 +105,7 @@ private fun _buildBody(loginState: LoginUiState) {
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.height(52.dp),
     ) {
-        Text(text = "Go to HomeScreen")
+        Text(text = "Login", color = Color.White)
     }
     Spacer(modifier = Modifier.height(8.dp))
 

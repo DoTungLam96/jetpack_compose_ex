@@ -9,11 +9,11 @@ import com.example.jc_example_1.services.AuthService
 import com.example.jc_example_1.services.UserService
 import javax.inject.Inject
 
-
 interface UserRepository {
     suspend fun getComments(postId: Int): ApiResult<List<Comment>?>
-}
 
+    suspend fun getUserInfo(): ApiResult<User?>
+}
 
 class UserRepositoryImpl @Inject constructor(private val userService: UserService) :
     UserRepository {
@@ -31,6 +31,19 @@ class UserRepositoryImpl @Inject constructor(private val userService: UserServic
 
             // Xử lý lỗi mạng, timeout, JSON lỗi, v.v.
             Log.e("API_ERROR", "Lỗi gọi API: ${e.message}")
+            ApiResult.Error(-1, "")
+        }
+    }
+
+    override suspend fun getUserInfo(): ApiResult<User?> {
+        return try {
+            val res = userService.getUserInfo()
+            if (res.isSuccessful) {
+                ApiResult.Success(res.body())
+            } else {
+                ApiResult.Error(res.code(), res.message())
+            }
+        } catch (e: Exception) {
             ApiResult.Error(-1, "")
         }
     }
