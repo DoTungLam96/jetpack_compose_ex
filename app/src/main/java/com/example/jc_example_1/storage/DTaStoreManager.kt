@@ -1,21 +1,18 @@
-import android.annotation.SuppressLint
+package com.example.jc_example_1.storage
+
 import android.content.Context
-import androidx.datastore.preferences.core.*
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-// Tạo DataStore
-
 val Context.dataStore by preferencesDataStore(name = "app_prefs")
-class DataStoreManager @Inject constructor(@ApplicationContext context: Context) {
 
-
-
-    private val dataStore = context.dataStore
+class DTaStoreManager  @Inject constructor(  private val dataStore: DataStore<Preferences>) {
     // 🛠 Kiểm tra key có tồn tại không (an toàn hơn)
     suspend fun containsKey(key: Preferences.Key<*>): Boolean {
         return dataStore.data.map { it.contains(key) }.first()
@@ -88,4 +85,5 @@ class DataStoreManager @Inject constructor(@ApplicationContext context: Context)
             prefs.remove(key)
         }
     }
+
 }

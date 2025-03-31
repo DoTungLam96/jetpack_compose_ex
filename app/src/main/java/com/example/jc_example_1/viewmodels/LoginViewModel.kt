@@ -1,6 +1,5 @@
 package com.example.jc_example_1.viewmodels
 
-import DataStoreManager
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +12,7 @@ import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.LoginRequest
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.repository.AuthRepository
+import com.example.jc_example_1.storage.DTaStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,17 +21,17 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepo: AuthRepository,
-    application: Application
+    application: Application,
+    private val dataStoreManager: DTaStoreManager
 ) : AndroidViewModel(application) {
     var loginState by mutableStateOf<LoginUiState>(LoginUiState.Init)
         private set
     var errorMessage by mutableStateOf<String?>(null)
         private set
-    var username by mutableStateOf<String>("")
+    var username by mutableStateOf<String>("037193002652")
         private set
-    var password by mutableStateOf<String>("")
+    var password by mutableStateOf<String>("Tam@12345")
         private set
-
     fun onSetUsername(text: String) {
         username = text;
     }
@@ -63,7 +63,7 @@ class LoginViewModel @Inject constructor(
                 if (result is ApiResult.Success) {
 
                     //save accessToken to data_store
-//                    saveAccessToken(result.data?.data ?: "")
+                    dataStoreManager.putString(Const.ACCESS_TOKEN, result.data?.data ?: "")
 
                     loginState = LoginUiState.Success(result.data)
                 } else if (result is ApiResult.Error) {
@@ -78,11 +78,4 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-
-    // 🌟 Lưu Access Token
-//    private fun saveAccessToken(token: String) {
-//        viewModelScope.launch {
-//            dataStoreManager.putString(Const.ACCESS_TOKEN, token)
-//        }
-//    }
 }

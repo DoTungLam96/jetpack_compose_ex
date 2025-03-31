@@ -1,6 +1,5 @@
 package com.example.jc_example_1.viewmodels
 
-import DataStoreManager
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +10,7 @@ import com.example.jc_example_1.models.LoginRequest
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.repository.AuthRepository
 import com.example.jc_example_1.repository.UserRepository
+import com.example.jc_example_1.storage.DTaStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,12 +18,13 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userRepo: UserRepository,
-//    private val dataStoreManager: DataStoreManager
+    private val dataStoreManager: DTaStoreManager
 ) : ViewModel() {
 
-//    @Inject
-//    lateinit var dataStoreManager: DataStoreManager
-    var user by mutableStateOf<User?>(null)
+//    var user by mutableStateOf<User?>(null)
+//        private set
+
+    var homeUIState by mutableStateOf<HomeUIState>(HomeUIState.Init)
         private set
 
     init {
@@ -34,13 +35,19 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
+
+                homeUIState = HomeUIState.Loading
+
                 val result = userRepo.getUserInfo()
+
                 if (result is ApiResult.Success) {
-                    print(result.data)
+                    homeUIState = HomeUIState.Success(result.data)
                 } else if (result is ApiResult.Error) {
-                    print(result)
+                    homeUIState = HomeUIState.Error(result.message)
                 }
-            } catch (_: Exception){}
+            } catch (_: Exception){
+
+            }
         }
     }
 

@@ -11,3 +11,4 @@ sealed class LoginUiState {
     data class Success(val data: LoginResponse?) : LoginUiState()
     data class Error(val message: String) : LoginUiState()
 }
+
