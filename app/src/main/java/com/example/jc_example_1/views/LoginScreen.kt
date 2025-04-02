@@ -1,5 +1,6 @@
 package com.example.jc_example_1.views
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,35 +33,23 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.jc_example_1.models.Const
-import com.example.jc_example_1.models.User
-import com.example.jc_example_1.viewmodels.LoginUiState
+import com.example.jc_example_1.viewmodels.LoginEvent
+import com.example.jc_example_1.viewmodels.LoginState
 import com.example.jc_example_1.viewmodels.LoginViewModel
-import com.example.jc_example_1.viewmodels.ShareViewModel
 
 @Composable
-fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen(navController: NavHostController,  viewModel: LoginViewModel = hiltViewModel()) {
 
-    val loginState = viewModel.loginState
+    val state by viewModel.state.collectAsState()
 
     val context = LocalContext.current
 
-    // Cập nhật messageError dựa vào loginState
-    LaunchedEffect(loginState) {
-        when (loginState) {
-            is LoginUiState.Init, is LoginUiState.Loading -> Unit
-            is LoginUiState.Error -> {
-                Toast.makeText(context, loginState.message, Toast.LENGTH_LONG).show()
-            }
-
-            is LoginUiState.Success -> {
-                navController.currentBackStackEntry?.savedStateHandle?.set(
-                    "Const.ACCESS_TOKEN", loginState.data
-                )
-                navController.navigate(Const.HOME_SCREEN) {
-                    // Nếu không muốn quay lại LoginScreen, loại bỏ nó khỏi back stack
-                    popUpTo(Const.LOGIN_SCREEN) { inclusive = true }
-                }
-
+    LaunchedEffect(state) {
+        if(state.error.isNullOrEmpty() && state.loginResponse != null){
+            viewModel.resetState()
+            navController.navigate(Const.HOME_SCREEN) {
+                // Nếu không muốn quay lại LoginScreen, loại bỏ nó khỏi back stack
+                popUpTo(Const.LOGIN_SCREEN) { inclusive = false }
             }
         }
     }
@@ -70,34 +60,40 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        _buildBody(loginState)
+        _buildBody(state)
     }
 }
 
 @Composable
-private fun _buildBody(loginState: LoginUiState) {
+private fun _buildBody(loginState: LoginState) {
     val viewModel: LoginViewModel = hiltViewModel()
-    OutlinedTextField(value = viewModel.username, onValueChange = {
-        viewModel.onSetUsername(it)
-    }, label = { Text("Username") }, modifier = Modifier.fillMaxWidth()
+    OutlinedTextField(
+        value = loginState.username,
+        onValueChange = {
+            viewModel.onEvent(LoginEvent.EnterUsername(it))
+        },
+        label = {
+            Text("Username") },
+        modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(12.dp))
+
     OutlinedTextField(
-        value = viewModel.password,
+        value = loginState.password,
         onValueChange = {
-        viewModel.onSetPassword(it)
-    },
+            viewModel.onEvent(LoginEvent.EnterPassword(it))
+        },
         label = { Text("Password") },
-      
+
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(20.dp))
-    if (loginState is LoginUiState.Loading) {
+    if (loginState.isLoading) {
         Spacer(modifier = Modifier.height(16.dp))
         CircularProgressIndicator()
     } else Button(
         onClick = {
-            viewModel.onLoginClicked(username = viewModel.username, password = viewModel.password)
+            viewModel.onEvent(LoginEvent.Submit)
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF009688)
@@ -109,7 +105,7 @@ private fun _buildBody(loginState: LoginUiState) {
     }
     Spacer(modifier = Modifier.height(8.dp))
 
-    viewModel.errorMessage?.let {
+    loginState.error?.let {
         Text(
             text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp)
         )

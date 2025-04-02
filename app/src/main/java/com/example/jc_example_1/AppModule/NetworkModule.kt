@@ -57,14 +57,12 @@ class InterceptorBaseUrl @Inject constructor( private  val dataStoreManager : DT
         val accessToken = runBlocking {
             dataStoreManager.getString(Const.ACCESS_TOKEN).first()
         }
-
         //case specific: chỉ dùng trong call api: /pticare/customers
         if (newUrl.url().path.contains("/pticare/customers") && accessToken.isNotBlank()){
             headers["token-id"] = accessToken
         }else if (accessToken.isNotBlank()){
             headers["Authorization"] = accessToken
         }
-
         // Xây dựng request mới, loại bỏ header "Service-Type" nếu không cần thiết cho server
         val newRequest =
             originalRequest.newBuilder().url(newUrl).removeHeader("Service-Type")
@@ -74,7 +72,6 @@ class InterceptorBaseUrl @Inject constructor( private  val dataStoreManager : DT
                     }
                 }
                 .build()
-
 
         return chain.proceed(newRequest)
     }

@@ -2,17 +2,21 @@ package com.example.jc_example_1.views
 
 import CustomCenterTopAppBar
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,19 +26,41 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.User
-import com.example.jc_example_1.viewmodels.ShareViewModel
+import com.example.jc_example_1.viewmodels.DetailViewModel
+import com.example.jc_example_1.viewmodels.DetailUIState
+import com.example.jc_example_1.viewmodels.HomeViewModel
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
-fun DetailScreen(navController: NavHostController, user: User? = null) {
+fun DetailScreen(
+    navController: NavHostController,
+    user: User? = null,
+    viewModel: DetailViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val parentEntry = navController.getBackStackEntry(Const.LOGIN_SCREEN)
+//    val data = detailVM.user_cc.collectAsState().value
+    val detailUIState = viewModel.detailState
 
+    LaunchedEffect(user) {
+        user?.let { viewModel.setUserData(it) }
+    }
 
-    val sharedViewModel: ShareViewModel = hiltViewModel(parentEntry)
+    LaunchedEffect(detailUIState) {
+        when (detailUIState) {
+            is DetailUIState.Init,  DetailUIState.Loading -> {
+            }
+
+            is DetailUIState.Error -> {
+                Toast.makeText(context, detailUIState.errorMessage, Toast.LENGTH_LONG).show()
+            }
+            else -> {}
+        }
+    }
+
     Scaffold(topBar = {
         CustomCenterTopAppBar(title = "Detail", onBackClick = {
             navController.popBackStack()
+            viewModel.resetState()
         })
     }) { paddingValues ->
         Surface(
@@ -48,14 +74,18 @@ fun DetailScreen(navController: NavHostController, user: User? = null) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Welcome ${sharedViewModel.user?.userId}")
+                if (detailUIState is DetailUIState.Loading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = "Welcome ${viewModel.contactModel?.identityNo}")
+                }
                 Button(
                     modifier = Modifier.padding(top = 16.dp),
                     onClick = {
+                        viewModel.updateContact()
+//                    navController.navigate(Const.OTHER_SCREEN)
 
-                    navController.navigate(Const.OTHER_SCREEN)
-
-                }) {
+                    }) {
                     Text(text = "Go to Others")
                 }
             }

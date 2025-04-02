@@ -2,6 +2,7 @@ package com.example.jc_example_1.services
 
 import com.example.jc_example_1.models.Comment
 import com.example.jc_example_1.models.Const
+import com.example.jc_example_1.models.ContactModel
 import com.example.jc_example_1.models.User
 import com.google.gson.JsonObject
 import retrofit2.Response
@@ -24,5 +25,10 @@ interface UserService {
     )
     suspend fun getUserInfo(
     ): Response<User?>
+
+    @GET("/pticare/customers/contact")
+    suspend fun getContact(
+        @Query("identityNo") identityNo: String
+    ):Response<ContactModel?>
 
 }

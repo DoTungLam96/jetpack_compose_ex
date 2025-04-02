@@ -11,7 +11,10 @@ object Const {
     const val BASE_URL_PTI = "https://gateway.pti.com.vn"
     const val AUTH_SERVICE = "authService"
     const val USER_SERVICE = "userService"
+    const val USER_ARGUMENT_KEY = "userJson"
 //    const val ACCESS_TOKEN = "accessToken"
     val ACCESS_TOKEN = stringPreferencesKey("access_token")
+
+    val IDENTITY_NO = stringPreferencesKey("identity_no")
 }
 

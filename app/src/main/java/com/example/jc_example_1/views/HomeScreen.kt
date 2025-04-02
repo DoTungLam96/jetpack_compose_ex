@@ -2,6 +2,7 @@ package com.example.jc_example_1.views
 
 import CustomCenterTopAppBar
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,44 +39,47 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.jc_example_1.models.Const
 import com.example.jc_example_1.models.User
-import com.example.jc_example_1.viewmodels.HomeUIState
+import com.example.jc_example_1.viewmodels.HomeEvent
+import com.example.jc_example_1.viewmodels.HomeState
 import com.example.jc_example_1.viewmodels.HomeViewModel
+import com.google.gson.Gson
 
-@SuppressLint("UnrememberedGetBackStackEntry", "SuspiciousIndentation", "UnrememberedMutableState")
+@SuppressLint("UnrememberedGetBackStackEntry", "SuspiciousIndentation", "UnrememberedMutableState",
+    "StateFlowValueCalledInComposition"
+)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
+
     viewModel: HomeViewModel = hiltViewModel()
 
 ) {
     val context = LocalContext.current
 
-    val homeUIState = viewModel.homeUIState
+    val state by viewModel.state.collectAsState()
 
-    var userInfo by remember { mutableStateOf<User?>(null) }
+    LaunchedEffect(Unit){
+        viewModel.onEvent(HomeEvent.onGetUserInfo)
+    }
 
-    LaunchedEffect(homeUIState) {
-        when (homeUIState) {
-            is HomeUIState.Init, is HomeUIState.Loading -> Unit
-            is HomeUIState.Error -> {
-                Toast.makeText(context, homeUIState.errorMessage, Toast.LENGTH_LONG).show()
-            }
+    LaunchedEffect(state) {
+        if(state is HomeState.Error){
+            Toast.makeText(context, (state as HomeState.Error).errorMessage, Toast.LENGTH_LONG ).show()
+        }
+        if(state is HomeState.NavHome){
 
-            is HomeUIState.Success -> {
-                userInfo = homeUIState.user
+            val userJson = Uri.encode(Gson().toJson((state as HomeState.NavHome).user))
 
-            }
+            navController.navigate("${Const.DETAIL_SCREEN}/$userJson")
+
+            viewModel.resetState()
         }
     }
 
     Scaffold(topBar = {
         CustomCenterTopAppBar(title = "Home",
-            onBackClick = {
-
-                navController.popBackStack()
-            },
-
             actions = {
                 Row {
                     IconButton(onClick = {
@@ -86,9 +91,7 @@ fun HomeScreen(
                             tint = Color.White
                         )
                     }
-
                     IconButton(onClick = {
-
                     }) {
                         Icon(
                             Icons.Default.Add,
@@ -96,7 +99,6 @@ fun HomeScreen(
                             tint = Color.White,
 
                             )
-
                     }
 
                 }
@@ -115,20 +117,21 @@ fun HomeScreen(
 
                 ){
 
+                    val homeUIState = state
+
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if(homeUIState is HomeUIState.Loading){
+                    if(homeUIState is  HomeState.Loading){
                         CircularProgressIndicator()
                     }
-                    if(homeUIState is HomeUIState.Error){
-                        buildBody(message = homeUIState.errorMessage, onClick = {
-                            Log.d("Test", homeUIState.errorMessage ?: "")
+                    if( homeUIState is HomeState.Error){
+                        buildBody(message = homeUIState.errorMessage ?: "", onClick = {
+                            Toast.makeText(context, homeUIState.errorMessage, Toast.LENGTH_LONG ).show()
                         })
-
                     }
-                    if(homeUIState is HomeUIState.Success){
+                    if(homeUIState is HomeState.Success){
                         buildBody(message = "Hi, ${homeUIState.user?.fullName}", onClick = {
-                            Log.d("Test", homeUIState.user?.identityNo ?: "")
+                            viewModel.onEvent(HomeEvent.onContinue)
                         })
 
                     }
