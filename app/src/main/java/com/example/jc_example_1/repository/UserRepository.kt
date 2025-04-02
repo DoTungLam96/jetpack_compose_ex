@@ -31,7 +31,7 @@ class UserRepositoryImpl @Inject constructor(private val userService: UserServic
         } catch (e: Exception) {
             // Xử lý lỗi mạng, timeout, JSON lỗi, v.v.
             Log.e("API_ERROR", "Lỗi gọi API: ${e.message}")
-            ApiResult.Error(-1, "")
+            ApiResult.Error(-1, "Lỗi gọi API")
         }
     }
 

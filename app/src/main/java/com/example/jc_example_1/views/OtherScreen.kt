@@ -26,10 +26,12 @@ fun OtherScreen(navController: NavHostController, user: User? = null) {
         CustomCenterTopAppBar(title = "Other Screen", onBackClick = {
 //            navController.popBackStack(route = Const.HOME_SCREEN, inclusive = true)
 
-            navController.navigate(Const.HOME_SCREEN) {
-                popUpTo("login") { inclusive = false }
-                launchSingleTop = true
-            }
+            navController.popBackStack()
+
+//            navController.navigate(Const.HOME_SCREEN) {
+//                popUpTo("login") { inclusive = false }
+//                launchSingleTop = true
+//            }
         })
     }) { paddingValues ->
         Surface(

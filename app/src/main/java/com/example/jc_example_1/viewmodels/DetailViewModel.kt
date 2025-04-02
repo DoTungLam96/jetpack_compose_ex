@@ -24,37 +24,50 @@ class DetailViewModel @Inject constructor(
     private val dataStoreManager: DTaStoreManager
 ) : ViewModel() {
 
-    var detailState by mutableStateOf<DetailUIState>(DetailUIState.Init)
-        private set
+//    var detailState by mutableStateOf<DetailUIState>(DetailUIState.Init)
+//        private set
+//    var contactModel by mutableStateOf<ContactModel?>(null)
+//        private set
 
-//    private val _user_cc = MutableStateFlow<User?>(null)
-//    val user_cc: StateFlow<User?> = _user_cc
+//    private var user : User? = null
 //
-//    fun setUser(newUser: User) {
-//        _user_cc.value = newUser
+//    fun setUserData(currentUser : User?){
+//        user = currentUser
 //    }
 
-    var contactModel by mutableStateOf<ContactModel?>(null)
-        private set
-
-    private var user : User? = null
-
-    fun setUserData(currentUser : User?){
-        user = currentUser
-    }
+    private  val _state = MutableStateFlow<DetailState>(DetailState())
+    val state : StateFlow<DetailState> = _state
 
     init {
-        getContact()
+//        getContact()
+
+        _state.value = _state.value.copy(isInitial = true)
+    }
+
+
+
+    fun onEvent(event: DetailEvent){
+        when(event)
+        {
+            is DetailEvent.onGetContact -> getContact()
+            is DetailEvent.onInit -> {
+                print(event)
+                _state.value = _state.value.copy(user = event.user)
+                getContact()
+            }
+        }
     }
 
     fun resetState() {
-        detailState = DetailUIState.Init
+//        detailState = DetailUIState.Init
     }
 
     fun getContact() {
         viewModelScope.launch {
 
-            detailState = DetailUIState.Loading
+//            detailState = DetailUIState.Loading
+
+            _state.value = _state.value.copy(isLoading = true, isInitial = false, errorMessage = null)
 
             val identityNo = dataStoreManager.getString(Const.IDENTITY_NO).first()
 
@@ -64,20 +77,18 @@ class DetailViewModel @Inject constructor(
 
             if (result is ApiResult.Success) {
 
-                contactModel = result.data
+//                contactModel = result.data
+                _state.value = _state.value.copy(isLoading = false, contactModel = result.data)
 
-                detailState = DetailUIState.Success(result.data)
+//                detailState = DetailUIState.Success(result.data)
             }
             if (result is ApiResult.Error){
-                detailState = DetailUIState.Error(result.message)
+                _state.value = _state.value.copy(isLoading = false, errorMessage = result.message)
+//                detailState = DetailUIState.Error(result.message)
             }
 
         }
     }
 
-    fun updateContact( item: User? = null){
-
-        contactModel = contactModel?.copy(identityNo = (item ?: user)?.fullName ?: "")
-        print(contactModel)
-    }
+//
 }

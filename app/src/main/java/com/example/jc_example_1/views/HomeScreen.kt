@@ -61,20 +61,15 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit){
-        viewModel.onEvent(HomeEvent.onGetUserInfo)
+
     }
 
     LaunchedEffect(state) {
+        if (state is HomeState.Init)  {
+            viewModel.onEvent(HomeEvent.onGetUserInfo)
+        }
         if(state is HomeState.Error){
             Toast.makeText(context, (state as HomeState.Error).errorMessage, Toast.LENGTH_LONG ).show()
-        }
-        if(state is HomeState.NavHome){
-
-            val userJson = Uri.encode(Gson().toJson((state as HomeState.NavHome).user))
-
-            navController.navigate("${Const.DETAIL_SCREEN}/$userJson")
-
-            viewModel.resetState()
         }
     }
 
@@ -131,7 +126,10 @@ fun HomeScreen(
                     }
                     if(homeUIState is HomeState.Success){
                         buildBody(message = "Hi, ${homeUIState.user?.fullName}", onClick = {
-                            viewModel.onEvent(HomeEvent.onContinue)
+
+                            val userJson = Uri.encode(Gson().toJson(homeUIState.user))
+
+                            navController.navigate("${Const.DETAIL_SCREEN}/$userJson")
                         })
 
                     }

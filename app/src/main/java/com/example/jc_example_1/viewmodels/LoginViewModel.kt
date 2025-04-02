@@ -38,7 +38,6 @@ class LoginViewModel @Inject constructor(
     fun resetState() {
         _state.value = LoginState()
     }
-
     fun onEvent(event: LoginEvent) {
         when (event) {
             is LoginEvent.EnterUsername -> _state.value = _state.value.copy(username = event.username)
@@ -46,7 +45,6 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.Submit -> onLogin()
         }
     }
-
     fun onLogin() {
         var errorMessage: String? = null
 

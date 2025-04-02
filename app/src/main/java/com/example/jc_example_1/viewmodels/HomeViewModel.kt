@@ -26,27 +26,17 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> = _state
 
     private var user: User? = null
-
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.onGetUserInfo -> getUserInfo()
-            is HomeEvent.onContinue -> onContinue()
         }
     }
-
     fun resetState(){
         _state.value = HomeState.Init
     }
-
-
-    private fun onContinue() {
-        _state.value = HomeState.NavHome(user)
-    }
-
     private fun getUserInfo() {
         viewModelScope.launch {
             try {
-
                 _state.value = HomeState.Loading
                 val result = userRepo.getUserInfo()
 
