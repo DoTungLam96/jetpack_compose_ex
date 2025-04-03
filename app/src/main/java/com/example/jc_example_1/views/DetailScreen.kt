@@ -2,6 +2,7 @@ package com.example.jc_example_1.views
 
 import CustomCenterTopAppBar
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,8 +32,9 @@ import com.example.jc_example_1.models.User
 import com.example.jc_example_1.viewmodels.DetailEvent
 import com.example.jc_example_1.viewmodels.DetailState
 import com.example.jc_example_1.viewmodels.DetailViewModel
-import com.example.jc_example_1.viewmodels.DetailUIState
+
 import com.example.jc_example_1.viewmodels.HomeViewModel
+import com.google.gson.Gson
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
@@ -45,32 +47,25 @@ fun DetailScreen(
 
     val state by viewModel.state.collectAsState()
 
+
     LaunchedEffect(state) {
-            if (state.isInitial){
+           when(state){
+               is DetailState.Init -> {
+                   viewModel.onEvent(DetailEvent.onInit(user =  user))
+               }
+               is DetailState.Loading, is DetailState.Success -> {}
+               is DetailState.Error -> {
+                   Toast.makeText(context, (state as DetailState.Error).errorMessage ?: "", Toast.LENGTH_SHORT ).show()
+               }
+               else  -> {}
 
-                viewModel.onEvent(DetailEvent.onInit(user = user))
-            }
-            if(!state.errorMessage.isNullOrBlank()){
-                Toast.makeText(context, state.errorMessage!!, Toast.LENGTH_SHORT).show()
-            }
+           }
     }
-
-//    LaunchedEffect(detailUIState) {
-//        when (detailUIState) {
-//            is DetailUIState.Init,  DetailUIState.Loading -> {
-//            }
-//
-//            is DetailUIState.Error -> {
-//                Toast.makeText(context, detailUIState.errorMessage, Toast.LENGTH_LONG).show()
-//            }
-//            else -> {}
-//        }
-//    }
 
     Scaffold(topBar = {
         CustomCenterTopAppBar(title = "Detail", onBackClick = {
             navController.popBackStack()
-            viewModel.resetState()
+
         })
     }) { paddingValues ->
         Surface(
@@ -84,22 +79,27 @@ fun DetailScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (state.isLoading ) {
+                if (state is DetailState.Loading ) {
                     CircularProgressIndicator()
                 }
 
-                if(!state.errorMessage.isNullOrBlank()){
-                    Text(text = "${state.errorMessage}", color = Color.Red)
+                if(state is DetailState.Error){
+                    Text(text = "${(state as DetailState.Error).errorMessage}", color = Color.Red)
                 }
 
-                 if(state.contactModel != null && state.errorMessage.isNullOrBlank()) {
-                    Text(text = "Welcome ${state.contactModel?.identityNo}")
+                 if(state is DetailState.Success) {
+                    Text(text = "Welcome ${(state as DetailState.Success).contactModel?.identityNo}")
                 }
+
                 Button(
                     modifier = Modifier.padding(top = 16.dp),
                     onClick = {
-//                        viewModel.updateContact()
-                    navController.navigate(Const.OTHER_SCREEN)
+                        viewModel.onEvent(DetailEvent.onUpdateContact)
+
+                        val userJson = Uri.encode(Gson().toJson(viewModel.currentContact))
+
+                        navController.navigate("${Const.OTHER_SCREEN}/$userJson")
+
 
                     }) {
                     Text(text = "Go to Others")

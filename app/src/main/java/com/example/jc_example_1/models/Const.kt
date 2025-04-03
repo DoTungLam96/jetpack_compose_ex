@@ -12,7 +12,7 @@ object Const {
     const val AUTH_SERVICE = "authService"
     const val USER_SERVICE = "userService"
     const val USER_ARGUMENT_KEY = "userJson"
-//    const val ACCESS_TOKEN = "accessToken"
+    const val CONTACT_ARGUMENT_KEY = "contactJson"
     val ACCESS_TOKEN = stringPreferencesKey("access_token")
 
     val IDENTITY_NO = stringPreferencesKey("identity_no")

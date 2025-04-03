@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
 import androidx.navigation.navArgument
 import com.example.jc_example_1.models.Const
+import com.example.jc_example_1.models.ContactModel
 import com.example.jc_example_1.models.User
 import com.example.jc_example_1.views.DetailScreen
 import com.example.jc_example_1.views.HomeScreen
@@ -32,7 +33,8 @@ fun AppNavHost(navController: NavHostController) {
         }
         composable(
             route = "${Const.DETAIL_SCREEN}/{${Const.USER_ARGUMENT_KEY}}",
-            arguments = listOf(navArgument(Const.USER_ARGUMENT_KEY) { type = NavType.StringType })
+            arguments = listOf(navArgument(Const.USER_ARGUMENT_KEY) { type = NavType.StringType }
+            )
         ) {
                 backStackEntry ->
             val userJson = backStackEntry.arguments?.getString(Const.USER_ARGUMENT_KEY)
@@ -44,8 +46,19 @@ fun AppNavHost(navController: NavHostController) {
             }
             DetailScreen(navController = navController, user = user)
         }
-        composable(Const.OTHER_SCREEN) {
-            OtherScreen(navController = navController)
+        composable(
+            route = "${Const.OTHER_SCREEN}/{${Const.CONTACT_ARGUMENT_KEY}}",
+            arguments = listOf(navArgument(Const.CONTACT_ARGUMENT_KEY) { type = NavType.StringType })
+        ) {
+                backStackEntry ->
+            val contactJson = backStackEntry.arguments?.getString(Const.CONTACT_ARGUMENT_KEY)
+
+            val contactModel = try {
+                Gson().fromJson(contactJson, ContactModel::class.java)
+            } catch (e: Exception) {
+                null
+            }
+            OtherScreen(navController = navController, contactModel= contactModel)
         }
 
 

@@ -24,50 +24,32 @@ class DetailViewModel @Inject constructor(
     private val dataStoreManager: DTaStoreManager
 ) : ViewModel() {
 
-//    var detailState by mutableStateOf<DetailUIState>(DetailUIState.Init)
-//        private set
-//    var contactModel by mutableStateOf<ContactModel?>(null)
-//        private set
+    private val _state = MutableStateFlow<DetailState>(DetailState.Init())
+    val state: StateFlow<DetailState> = _state
+    private var _user: User? = null
+    private var _currentContact: ContactModel? = null
 
-//    private var user : User? = null
-//
-//    fun setUserData(currentUser : User?){
-//        user = currentUser
-//    }
+    val currentContact: ContactModel?
+        get() = _currentContact
 
-    private  val _state = MutableStateFlow<DetailState>(DetailState())
-    val state : StateFlow<DetailState> = _state
-
-    init {
-//        getContact()
-
-        _state.value = _state.value.copy(isInitial = true)
-    }
-
-
-
-    fun onEvent(event: DetailEvent){
-        when(event)
-        {
-            is DetailEvent.onGetContact -> getContact()
+    fun onEvent(event: DetailEvent) {
+        when (event) {
             is DetailEvent.onInit -> {
-                print(event)
-                _state.value = _state.value.copy(user = event.user)
+                _user = event.user
+
                 getContact()
             }
-        }
-    }
 
-    fun resetState() {
-//        detailState = DetailUIState.Init
+            is DetailEvent.onUpdateContact -> {
+                updateContact()
+            }
+        }
     }
 
     fun getContact() {
         viewModelScope.launch {
 
-//            detailState = DetailUIState.Loading
-
-            _state.value = _state.value.copy(isLoading = true, isInitial = false, errorMessage = null)
+            _state.value = DetailState.Loading
 
             val identityNo = dataStoreManager.getString(Const.IDENTITY_NO).first()
 
@@ -76,19 +58,19 @@ class DetailViewModel @Inject constructor(
             val result = userRepository.getContact(identityNo)
 
             if (result is ApiResult.Success) {
-
-//                contactModel = result.data
-                _state.value = _state.value.copy(isLoading = false, contactModel = result.data)
-
-//                detailState = DetailUIState.Success(result.data)
+                _currentContact = result.data
+                _state.value = DetailState.Success(contactModel = result.data)
             }
-            if (result is ApiResult.Error){
-                _state.value = _state.value.copy(isLoading = false, errorMessage = result.message)
-//                detailState = DetailUIState.Error(result.message)
+            if (result is ApiResult.Error) {
+                _state.value = DetailState.Error(errorMessage = result.message)
             }
 
         }
     }
 
-//
+    private fun updateContact() {
+        _currentContact = _currentContact?.copy(identityNo = _user?.fullName ?: "")
+
+        _state.value = DetailState.Success(contactModel = _currentContact)
+    }
 }
